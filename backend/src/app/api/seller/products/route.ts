@@ -159,8 +159,8 @@ export async function POST(req: NextRequest) {
       product: {
         ...newProduct,
         images: imagesArray,
-        sizes: sizesString ? sizesString.split(",").map((s) => s.trim()) : [],
-        colors: colorsString ? colorsString.split(",").map((c) => c.trim()) : [],
+        sizes: sizesString ? sizesString.split(",").map((s: string) => s.trim()) : [],
+        colors: colorsString ? colorsString.split(",").map((c: string) => c.trim()) : [],
       },
     });
   } catch (error: any) {
