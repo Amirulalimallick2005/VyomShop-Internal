@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { calculateDistanceKm } from "@/lib/geo";
 
 export async function GET(req: NextRequest) {
   try {
@@ -10,9 +9,7 @@ export async function GET(req: NextRequest) {
     const gender = searchParams.get("gender");
     const minPrice = searchParams.get("minPrice") ? parseFloat(searchParams.get("minPrice")!) : undefined;
     const maxPrice = searchParams.get("maxPrice") ? parseFloat(searchParams.get("maxPrice")!) : undefined;
-    const userLat = parseFloat(searchParams.get("lat") || "28.6139");
-    const userLng = parseFloat(searchParams.get("lng") || "77.2090");
-    const sortBy = searchParams.get("sort") || "distance"; // "distance" | "price_asc" | "price_desc" | "newest"
+    const sortBy = searchParams.get("sort") || "newest"; // "price_asc" | "price_desc" | "newest"
 
     const whereClause: any = {
       moderationStatus: "APPROVED",
@@ -67,15 +64,8 @@ export async function GET(req: NextRequest) {
       },
     });
 
-    // Enrich with distance to shop
+    // Map products to response format
     let results = products.map((prod) => {
-      const distance = calculateDistanceKm(
-        userLat,
-        userLng,
-        prod.shop.latitude,
-        prod.shop.longitude
-      );
-
       return {
         id: prod.id,
         name: prod.name,
@@ -112,7 +102,6 @@ export async function GET(req: NextRequest) {
           longitude: prod.shop.longitude,
           googleMapsPin: prod.shop.googleMapsPin,
           shopImage: prod.shop.shopImage,
-          distanceKm: distance,
         },
       };
     });
@@ -122,18 +111,15 @@ export async function GET(req: NextRequest) {
       results.sort((a, b) => a.price - b.price);
     } else if (sortBy === "price_desc") {
       results.sort((a, b) => b.price - a.price);
-    } else if (sortBy === "newest") {
-      results.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     } else {
-      // Default: distance
-      results.sort((a, b) => a.shop.distanceKm - b.shop.distanceKm);
+      // Default: newest
+      results.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     }
 
     return NextResponse.json({
       success: true,
       count: results.length,
       query,
-      userLocation: { lat: userLat, lng: userLng },
       products: results,
     });
   } catch (error: any) {

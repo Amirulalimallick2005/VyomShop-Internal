@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { calculateDistanceKm } from "@/lib/geo";
 
 export async function GET(
   req: NextRequest,
@@ -8,9 +7,6 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const { searchParams } = new URL(req.url);
-    const userLat = parseFloat(searchParams.get("lat") || "28.6139");
-    const userLng = parseFloat(searchParams.get("lng") || "77.2090");
 
     const product = await prisma.product.findUnique({
       where: { id },
@@ -25,13 +21,6 @@ export async function GET(
         { status: 404 }
       );
     }
-
-    const distance = calculateDistanceKm(
-      userLat,
-      userLng,
-      product.shop.latitude,
-      product.shop.longitude
-    );
 
     // Other products from this shop
     const otherProducts = await prisma.product.findMany({
@@ -86,7 +75,6 @@ export async function GET(
           googleMapsPin: product.shop.googleMapsPin,
           shopImage: product.shop.shopImage,
           timings: product.shop.timings,
-          distanceKm: distance,
         },
         otherShopProducts: otherProducts.map((p) => ({
           id: p.id,

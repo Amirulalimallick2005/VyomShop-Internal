@@ -36,7 +36,6 @@ export async function GET(req: NextRequest) {
         orderBy: { [sortField]: sortOrder },
         include: {
           shops: { select: { id: true, name: true, status: true, creditsBalance: true } },
-          _count: { select: { sessions: true } },
         },
       }),
     ]);
@@ -47,7 +46,6 @@ export async function GET(req: NextRequest) {
       email: u.email,
       role: u.role || "CUSTOMER",
       phoneNumber: u.phoneNumber,
-      phoneNumberVerified: u.phoneNumberVerified,
       banned: u.banned,
       banReason: u.banReason,
       shops: u.shops,
