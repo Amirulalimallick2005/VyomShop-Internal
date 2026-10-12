@@ -1,0 +1,162 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+model User {
+  id          String   @id // Firebase UID
+  name        String?
+  email       String?  @unique
+  phoneNumber String?  @unique
+  image       String?
+  role        String   @default("CUSTOMER") // SUPER_ADMIN, ADMIN, SELLER, CUSTOMER
+  banned      Boolean  @default(false)
+  banReason   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  shops         Shop[]
+  analyticsLogs AnalyticsLog[]
+
+  @@map("users")
+}
+
+
+model Shop {
+  id              String   @id @default(cuid())
+  ownerId         String
+  owner           User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  name            String
+  slug            String   @unique
+  description     String?
+  phone           String
+  email           String?
+  address         String
+  city            String   @default("Delhi")
+  area            String?  // Lajpat Nagar, Karol Bagh, Sarojini Nagar, Kamla Nagar, Chandni Chowk
+  pincode         String?
+  latitude        Float
+  longitude       Float
+  googleMapsPin   String?
+  bannerImage     String?
+  shopImage       String?
+  timings         String?  @default("10:00 AM - 9:00 PM")
+  status          String   @default("PENDING") // PENDING, APPROVED, REJECTED, SUSPENDED
+  rejectionReason String?
+  creditsBalance  Int      @default(0)
+  totalViews      Int      @default(0)
+  directionClicks Int      @default(0)
+  callClicks      Int      @default(0)
+  isVerified      Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  products      Product[]
+  transactions  Transaction[]
+  analyticsLogs AnalyticsLog[]
+
+  @@map("shops")
+}
+
+
+model Product {
+  id               String   @id @default(cuid())
+  shopId           String
+  shop             Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  name             String
+  description      String?
+  brand            String?
+  price            Float
+  mrp              Float?
+  category         String   // Footwear, Apparel, Ethnic Wear, Accessories
+  subcategory      String?
+  gender           String?  // Men, Women, Unisex, Kids
+  sizes            String?  // e.g. "UK 7, 8, 9" or "S, M, L, XL"
+  colors           String?  // e.g. "Black, Navy Blue"
+  stockStatus      String   @default("IN_STOCK") // IN_STOCK, LIMITED, OUT_OF_STOCK
+  images           String   // JSON string array of image URLs
+  isModerated      Boolean  @default(true)
+  moderationStatus String   @default("APPROVED") // APPROVED, PENDING, REJECTED
+  totalViews       Int      @default(0)
+  totalDirections  Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  analyticsLogs AnalyticsLog[]
+
+  @@map("products")
+}
+
+
+model Package {
+  id              String   @id @default(cuid())
+  name            String   // Starter, Growth, Pro, Business
+  totalListings   Int      // 10, 30, 60, 100
+  freeCredits     Int      // 0, 5, 15, 35
+  paidCredits     Int      // 10, 25, 45, 65
+  price           Float    // 100, 250, 450, 650
+  perProductPrice Float    // 10, 8.3, 7.5, 6.5
+  isActive        Boolean  @default(true)
+  sortOrder       Int      @default(0)
+  badge           String?  // "Popular", "Best Value"
+  description     String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  transactions Transaction[]
+
+  @@map("packages")
+}
+
+
+model Transaction {
+  id              String   @id @default(cuid())
+  shopId          String
+  shop            Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  packageId       String?
+  package         Package? @relation(fields: [packageId], references: [id], onDelete: SetNull)
+  amount          Float
+  creditsAdded    Int      @default(0)
+  creditsDeducted Int      @default(0)
+  type            String   // "PURCHASE", "BONUS", "DEDUCTION", "MANUAL_ADJUST"
+  paymentGateway  String?  @default("Razorpay")
+  paymentId       String?
+  orderId         String?
+  status          String   @default("SUCCESS") // SUCCESS, PENDING, FAILED
+  notes           String?
+  createdAt       DateTime @default(now())
+
+  @@map("transactions")
+}
+
+
+model SystemSetting {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       String
+  description String?
+  updatedAt   DateTime @updatedAt
+
+  @@map("system_settings")
+}
+
+
+model AnalyticsLog {
+  id        String   @id @default(cuid())
+  shopId    String?
+  shop      Shop?    @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  productId String?
+  product   Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  eventType String   // "VIEW", "GET_DIRECTION", "CALL", "SEARCH"
+  metadata  String?  // JSON string
+  createdAt DateTime @default(now())
+
+  @@map("analytics_logs")
+}
