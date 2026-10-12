@@ -69,7 +69,7 @@ export default function SellerAnalyticsPage() {
               title={<Text type="secondary">Total Views</Text>}
               value={stats.totalViews ?? 0}
               prefix={<Eye size={18} className="text-blue-500 mr-1" />}
-              valueStyle={{ color: "#3b82f6" }}
+              styles={{ content: { color: "#3b82f6" } }}
             />
           </Card>
         </Col>
@@ -79,7 +79,7 @@ export default function SellerAnalyticsPage() {
               title={<Text type="secondary">Direction Clicks</Text>}
               value={stats.directionClicks ?? 0}
               prefix={<Navigation size={18} className="text-green-500 mr-1" />}
-              valueStyle={{ color: "#22c55e" }}
+              styles={{ content: { color: "#22c55e" } }}
             />
           </Card>
         </Col>
@@ -89,7 +89,7 @@ export default function SellerAnalyticsPage() {
               title={<Text type="secondary">Call Clicks</Text>}
               value={stats.callClicks ?? 0}
               prefix={<Phone size={18} className="text-purple-500 mr-1" />}
-              valueStyle={{ color: "#a855f7" }}
+              styles={{ content: { color: "#a855f7" } }}
             />
           </Card>
         </Col>
@@ -100,7 +100,7 @@ export default function SellerAnalyticsPage() {
               value={stats.conversionRate ?? 0}
               suffix="%"
               prefix={<TrendingUp size={18} className="text-orange-500 mr-1" />}
-              valueStyle={{ color: "#f97316" }}
+              styles={{ content: { color: "#f97316" } }}
             />
           </Card>
         </Col>

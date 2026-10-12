@@ -13,6 +13,7 @@ import { App as AntdApp, ConfigProvider, Spin } from "antd";
 import { Store, BarChart2, Package, Home } from "lucide-react";
 import { sellerAuthProvider } from "@/lib/sellerAuthProvider";
 import { sellerDataProvider } from "@/lib/sellerDataProvider";
+import { RefineThemedSider } from "@/components/RefineThemedSider";
 import "@refinedev/antd/dist/reset.css";
 
 export const dynamic = "force-dynamic";
@@ -86,6 +87,7 @@ export default function SellerLayout({ children }: { children: React.ReactNode }
             options={{ syncWithLocation: true, warnWhenUnsavedChanges: true }}
           >
             <ThemedLayout
+              Sider={RefineThemedSider}
               Title={({ collapsed }: { collapsed: boolean }) => (
                 <ThemedTitle
                   collapsed={collapsed}

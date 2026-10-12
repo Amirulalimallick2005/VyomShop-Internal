@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { adminAuthProvider } from "@/lib/adminAuthProvider";
 import { adminDataProvider } from "@/lib/adminDataProvider";
+import { RefineThemedSider } from "@/components/RefineThemedSider";
 import "@refinedev/antd/dist/reset.css";
 
 export const dynamic = "force-dynamic";
@@ -110,6 +111,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             options={{ syncWithLocation: true, warnWhenUnsavedChanges: true }}
           >
             <ThemedLayout
+              Sider={RefineThemedSider}
               Title={({ collapsed }: { collapsed: boolean }) => (
                 <ThemedTitle
                   collapsed={collapsed}

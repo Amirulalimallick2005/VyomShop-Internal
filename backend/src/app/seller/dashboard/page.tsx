@@ -90,7 +90,7 @@ export default function SellerDashboardPage() {
           showIcon
           title="No shop registered yet"
           description={
-            <Space direction="vertical">
+            <Space orientation="vertical">
               <Text>You haven't registered your shop yet. Set up your shop profile to get started.</Text>
               <Link href="/seller/shop">
                 <Button type="primary" icon={<ArrowRight size={16} />} className="bg-orange-500">
@@ -157,7 +157,7 @@ export default function SellerDashboardPage() {
               title={<Text type="secondary">Total Views</Text>}
               value={analytics?.totalViews ?? shop.totalViews ?? 0}
               prefix={<Eye size={18} className="text-blue-500 mr-1" />}
-              valueStyle={{ color: "#3b82f6" }}
+              styles={{ content: { color: "#3b82f6" } }}
             />
           </Card>
         </Col>
@@ -167,7 +167,7 @@ export default function SellerDashboardPage() {
               title={<Text type="secondary">Direction Clicks</Text>}
               value={analytics?.directionClicks ?? shop.directionClicks ?? 0}
               prefix={<Navigation size={18} className="text-green-500 mr-1" />}
-              valueStyle={{ color: "#22c55e" }}
+              styles={{ content: { color: "#22c55e" } }}
             />
           </Card>
         </Col>
@@ -177,7 +177,7 @@ export default function SellerDashboardPage() {
               title={<Text type="secondary">Call Clicks</Text>}
               value={analytics?.callClicks ?? shop.callClicks ?? 0}
               prefix={<Phone size={18} className="text-purple-500 mr-1" />}
-              valueStyle={{ color: "#a855f7" }}
+              styles={{ content: { color: "#a855f7" } }}
             />
           </Card>
         </Col>
@@ -187,7 +187,7 @@ export default function SellerDashboardPage() {
               title={<Text type="secondary">Credits Balance</Text>}
               value={wallet?.shop?.creditsBalance ?? shop.creditsBalance ?? 0}
               prefix={<Coins size={18} className="text-orange-500 mr-1" />}
-              valueStyle={{ color: "#f97316" }}
+              styles={{ content: { color: "#f97316" } }}
             />
           </Card>
         </Col>
@@ -196,7 +196,7 @@ export default function SellerDashboardPage() {
       <Row gutter={[16, 16]}>
         <Col xs={24} md={12}>
           <Card title="Quick Actions" className="rounded-xl border-0 shadow-sm">
-            <Space direction="vertical" className="w-full">
+            <Space orientation="vertical" className="w-full">
               <Link href="/seller/products/create">
                 <Button block icon={<Package size={16} />} type="primary" className="bg-orange-500 text-left">
                   Add New Product
@@ -228,7 +228,7 @@ export default function SellerDashboardPage() {
             <Statistic
               value={wallet?.shop?.creditsBalance ?? shop.creditsBalance ?? 0}
               suffix="credits remaining"
-              valueStyle={{ fontSize: 28, color: "#f97316" }}
+              styles={{ content: { fontSize: 28, color: "#f97316" } }}
             />
             <Text type="secondary" className="text-xs">
               Each product listing costs 1 credit

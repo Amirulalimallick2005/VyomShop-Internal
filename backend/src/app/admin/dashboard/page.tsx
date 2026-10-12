@@ -68,7 +68,7 @@ export default function AdminDashboardPage() {
               <Statistic
                 title={<Text type="secondary" className="text-xs">{m.title}</Text>}
                 value={m.value ?? 0}
-                valueStyle={{ color: m.color, fontSize: 22 }}
+                styles={{ content: { color: m.color, fontSize: 22 } }}
               />
             </Card>
           </Col>

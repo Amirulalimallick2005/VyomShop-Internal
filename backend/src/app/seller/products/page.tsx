@@ -1,7 +1,7 @@
 "use client";
 
 import { useDelete, useGetIdentity } from "@refinedev/core";
-import { useTable } from "@refinedev/antd";
+import { useTable } from "@/lib/useTable";
 import {
   Table,
   Button,
@@ -111,7 +111,7 @@ export default function SellerProductsPage() {
               title: "Category",
               dataIndex: "category",
               render: (cat: string, record: any) => (
-                <Space direction="vertical" size={0}>
+                <Space orientation="vertical" size={0}>
                   <Tag>{cat}</Tag>
                   {record.subcategory && <Text type="secondary" className="text-xs">{record.subcategory}</Text>}
                 </Space>
@@ -121,7 +121,7 @@ export default function SellerProductsPage() {
               title: "Price",
               key: "price",
               render: (_, record: any) => (
-                <Space direction="vertical" size={0}>
+                <Space orientation="vertical" size={0}>
                   <Text strong>₹{record.price?.toLocaleString()}</Text>
                   {record.mrp && record.mrp > record.price && (
                     <Text delete type="secondary" className="text-xs">

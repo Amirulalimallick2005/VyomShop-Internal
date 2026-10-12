@@ -1,6 +1,6 @@
 "use client";
 
-import { useTable } from "@refinedev/antd";
+import { useTable } from "@/lib/useTable";
 import { Table, Tag, Typography, Card, Image } from "antd";
 import { Package } from "lucide-react";
 

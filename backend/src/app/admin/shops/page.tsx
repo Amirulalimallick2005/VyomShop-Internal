@@ -1,6 +1,6 @@
 "use client";
 
-import { useTable } from "@refinedev/antd";
+import { useTable } from "@/lib/useTable";
 import {
   Table,
   Tag,

@@ -195,7 +195,7 @@ export default function AdminShopDetailPage() {
 
           <Card className="rounded-xl border-0 shadow-sm">
             <Title level={5} className="!mb-4">Stats</Title>
-            <Space direction="vertical" className="w-full">
+            <Space orientation="vertical" className="w-full">
               <Statistic title="Credits Balance" value={shop.creditsBalance ?? 0} />
               <Statistic title="Total Views" value={shop.totalViews ?? 0} />
               <Statistic title="Direction Clicks" value={shop.directionClicks ?? 0} />

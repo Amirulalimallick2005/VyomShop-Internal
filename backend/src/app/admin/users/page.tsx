@@ -1,7 +1,7 @@
 "use client";
 
 import { useCustomMutation } from "@refinedev/core";
-import { useTable } from "@refinedev/antd";
+import { useTable } from "@/lib/useTable";
 import { Table, Tag, Button, Typography, Card, Popconfirm } from "antd";
 import { Ban, CheckCircle } from "lucide-react";
 
