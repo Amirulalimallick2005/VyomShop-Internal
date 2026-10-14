@@ -59,14 +59,14 @@ export const AdminDashboard = () => {
   const recentTransactions = data?.recentTransactions || [];
 
   const statCards = [
-    { title: "Total Shops", value: metrics.totalShops ?? 0, icon: <Store className="size-5 text-indigo-500" /> },
-    { title: "Approved Shops", value: metrics.approvedShops ?? 0, icon: <CheckCircle className="size-5 text-green-500" /> },
-    { title: "Pending Approval", value: metrics.pendingShops ?? 0, icon: <Clock className="size-5 text-yellow-500" /> },
-    { title: "Total Users", value: metrics.totalUsers ?? 0, icon: <Users className="size-5 text-blue-500" /> },
-    { title: "Total Products", value: metrics.totalProducts ?? 0, icon: <Package className="size-5 text-purple-500" /> },
-    { title: "Total Revenue", value: `₹${(metrics.totalRevenue || 0).toLocaleString()}`, icon: <IndianRupee className="size-5 text-orange-500" /> },
-    { title: "Total Views", value: (metrics.totalViews || 0).toLocaleString(), icon: <Eye className="size-5 text-cyan-500" /> },
-    { title: "Direction Clicks", value: (metrics.totalDirections || 0).toLocaleString(), icon: <Navigation className="size-5 text-teal-500" /> },
+    { title: "Total Shops", value: metrics.totalShops ?? 0, icon: <Store className="size-5" /> },
+    { title: "Approved Shops", value: metrics.approvedShops ?? 0, icon: <CheckCircle className="size-5" /> },
+    { title: "Pending Approval", value: metrics.pendingShops ?? 0, icon: <Clock className="size-5" /> },
+    { title: "Total Users", value: metrics.totalUsers ?? 0, icon: <Users className="size-5" /> },
+    { title: "Total Products", value: metrics.totalProducts ?? 0, icon: <Package className="size-5" /> },
+    { title: "Total Revenue", value: `₹${(metrics.totalRevenue || 0).toLocaleString()}`, icon: <IndianRupee className="size-5" /> },
+    { title: "Total Views", value: (metrics.totalViews || 0).toLocaleString(), icon: <Eye className="size-5" /> },
+    { title: "Direction Clicks", value: (metrics.totalDirections || 0).toLocaleString(), icon: <Navigation className="size-5" /> },
   ];
 
   return (
@@ -96,10 +96,10 @@ export const AdminDashboard = () => {
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
               <CardTitle className="text-base flex items-center gap-2">
-                <Clock className="size-4 text-yellow-500" />
+                <Clock className="size-4" />
                 Pending Shop Approvals
                 {metrics.pendingShops > 0 && (
-                  <Badge variant="secondary" className="bg-yellow-500/10 text-yellow-700 dark:text-yellow-400">
+                  <Badge variant="secondary">
                     {metrics.pendingShops}
                   </Badge>
                 )}
@@ -138,7 +138,7 @@ export const AdminDashboard = () => {
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
               <CardTitle className="text-base flex items-center gap-2">
-                <IndianRupee className="size-4 text-green-500" />
+                <IndianRupee className="size-4" />
                 Recent Transactions
               </CardTitle>
               <CardDescription>Latest credit package purchases</CardDescription>
@@ -161,7 +161,7 @@ export const AdminDashboard = () => {
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="font-semibold text-sm text-green-600">₹{tx.amount?.toLocaleString()}</p>
+                      <p className="font-semibold text-sm">₹{tx.amount?.toLocaleString()}</p>
                       <Badge variant={tx.status === "SUCCESS" ? "default" : "destructive"} className="text-[10px]">
                         {tx.status}
                       </Badge>

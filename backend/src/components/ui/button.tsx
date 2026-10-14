@@ -43,12 +43,17 @@ function Button({
   className,
   variant = "default",
   size = "default",
+  render,
   ...props
 }: ButtonPrimitive.Props & VariantProps<typeof buttonVariants>) {
+  // When a custom render element is provided, we're not using a native button
+  const useCustomRender = !!render;
+  
   return (
     <ButtonPrimitive
-      data-slot="button"
+      render={render || <button data-slot="button" />}
       className={cn(buttonVariants({ variant, size, className }))}
+      {...(useCustomRender ? { nativeButton: false } : {})}
       {...props}
     />
   )

@@ -1,5 +1,3 @@
-"use client";
-
 import React from "react";
 import { Admin } from "@/components/admin";
 import { Resource } from "ra-core";
@@ -28,10 +26,9 @@ const SellerLayout = (props: any) => (
   />
 );
 
-export const SellerApp = () => {
+const SellerApp = () => {
   return (
     <Admin
-      basename="/seller"
       dataProvider={raSellerDataProvider}
       authProvider={raSellerAuthProvider}
       i18nProvider={i18nProvider}

@@ -48,6 +48,7 @@ export async function GET(req: NextRequest) {
           name: shop.name,
           slug: shop.slug,
           status: shop.status,
+          rejectionReason: shop.rejectionReason,
           creditsBalance: shop.creditsBalance,
           phone: shop.phone,
           address: shop.address,
