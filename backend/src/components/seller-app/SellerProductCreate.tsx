@@ -9,17 +9,6 @@ import { SelectInput } from "@/components/admin/select-input";
 import { required } from "ra-core";
 import { Card, CardContent } from "@/components/ui/card";
 
-const categories = [
-  { id: "CLOTHING", name: "Clothing" },
-  { id: "FOOTWEAR", name: "Footwear" },
-  { id: "ACCESSORIES", name: "Accessories" },
-  { id: "ELECTRONICS", name: "Electronics" },
-  { id: "BEAUTY", name: "Beauty & Personal Care" },
-  { id: "HOME", name: "Home & Kitchen" },
-  { id: "JEWELLERY", name: "Jewellery" },
-  { id: "OTHER", name: "Other" },
-];
-
 const stockChoices = [
   { id: "IN_STOCK", name: "In Stock" },
   { id: "LIMITED", name: "Limited Stock" },
@@ -34,6 +23,26 @@ const genderChoices = [
 ];
 
 export const SellerProductCreate = () => {
+  const [categories, setCategories] = React.useState<{ id: string; name: string }[]>([]);
+  const [loadingCategories, setLoadingCategories] = React.useState(true);
+
+  React.useEffect(() => {
+    fetch("/api/categories")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.categories && Array.isArray(data.categories)) {
+          setCategories(
+            data.categories.map((c: any) => ({
+              id: c.name,
+              name: c.name,
+            }))
+          );
+        }
+      })
+      .catch((err) => console.error("Failed to load categories:", err))
+      .finally(() => setLoadingCategories(false));
+  }, []);
+
   return (
     <Create redirect="list">
       <Card className="max-w-3xl">
@@ -54,6 +63,7 @@ export const SellerProductCreate = () => {
                 source="category"
                 label="Category"
                 choices={categories}
+                isLoading={loadingCategories}
                 validate={[required()]}
               />
               <TextInput source="subcategory" label="Subcategory (optional)" />

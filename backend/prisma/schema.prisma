@@ -30,6 +30,8 @@ model Shop {
   id              String   @id @default(cuid())
   ownerId         String
   owner           User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  marketId        String?
+  market          Market?  @relation(fields: [marketId], references: [id], onDelete: SetNull)
   name            String
   slug            String   @unique
   description     String?
@@ -64,15 +66,17 @@ model Shop {
 
 
 model Product {
-  id               String   @id @default(cuid())
+  id               String    @id @default(cuid())
   shopId           String
-  shop             Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  shop             Shop      @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  categoryId       String?
+  categoryRel      Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   name             String
   description      String?
   brand            String?
   price            Float
   mrp              Float?
-  category         String   // Footwear, Apparel, Ethnic Wear, Accessories
+  category         String   // Category name e.g. "Clothing", "Footwear"
   subcategory      String?
   gender           String?  // Men, Women, Unisex, Kids
   sizes            String?  // e.g. "UK 7, 8, 9" or "S, M, L, XL"
@@ -158,4 +162,41 @@ model AnalyticsLog {
   createdAt DateTime @default(now())
 
   @@map("analytics_logs")
+}
+
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  icon        String?
+  isActive    Boolean   @default(true)
+  sortOrder   Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  products    Product[]
+
+  @@map("categories")
+}
+
+
+model Market {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
+  city        String    @default("Delhi")
+  pincode     String?
+  latitude    Float?
+  longitude   Float?
+  description String?
+  isActive    Boolean   @default(true)
+  sortOrder   Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  shops       Shop[]
+
+  @@map("markets")
 }

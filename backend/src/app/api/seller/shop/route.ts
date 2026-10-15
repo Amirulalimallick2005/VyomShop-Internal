@@ -11,6 +11,7 @@ export async function GET(req: NextRequest) {
   const shop = await prisma.shop.findFirst({
     where: { ownerId: authContext.user.id },
     include: {
+      market: true,
       _count: {
         select: { products: true, transactions: true },
       },
@@ -63,6 +64,7 @@ export async function POST(req: NextRequest) {
       address,
       city = "Delhi",
       area,
+      marketId: directMarketId,
       pincode,
       latitude,
       longitude,
@@ -83,6 +85,32 @@ export async function POST(req: NextRequest) {
     const baseSlug = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
     const slug = `${baseSlug}-${Math.random().toString(36).substring(2, 6)}`;
 
+    // Resolve marketId and area
+    let resolvedMarketId = directMarketId || null;
+    let resolvedArea = area || null;
+
+    if (!resolvedMarketId && area) {
+      const matchedMarket = await prisma.market.findFirst({
+        where: {
+          OR: [
+            { name: { equals: area.trim(), mode: "insensitive" } },
+            { slug: { equals: area.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-"), mode: "insensitive" } },
+          ],
+        },
+      });
+      if (matchedMarket) {
+        resolvedMarketId = matchedMarket.id;
+        resolvedArea = matchedMarket.name;
+      }
+    } else if (resolvedMarketId && !resolvedArea) {
+      const matchedMarket = await prisma.market.findUnique({
+        where: { id: resolvedMarketId },
+      });
+      if (matchedMarket) {
+        resolvedArea = matchedMarket.name;
+      }
+    }
+
     // Read default signup bonus credits from system settings
     const bonusSetting = await prisma.systemSetting.findUnique({
       where: { key: "default_free_credits_signup" },
@@ -92,13 +120,14 @@ export async function POST(req: NextRequest) {
     const newShop = await prisma.shop.create({
       data: {
         ownerId: authContext.user.id,
+        marketId: resolvedMarketId,
         name,
         slug,
         phone,
         email: email || authContext.user.email,
         address,
         city,
-        area: area || "Delhi",
+        area: resolvedArea || "Delhi",
         pincode,
         latitude: parseFloat(latitude),
         longitude: parseFloat(longitude),
@@ -163,6 +192,7 @@ export async function PUT(req: NextRequest) {
       email,
       address,
       area,
+      marketId: directMarketId,
       pincode,
       latitude,
       longitude,
@@ -173,6 +203,33 @@ export async function PUT(req: NextRequest) {
       description,
     } = body;
 
+    let resolvedMarketId: string | null | undefined = directMarketId;
+    let resolvedArea: string | undefined = area;
+
+    if (area !== undefined && directMarketId === undefined) {
+      if (area) {
+        const matchedMarket = await prisma.market.findFirst({
+          where: {
+            OR: [
+              { name: { equals: area.trim(), mode: "insensitive" } },
+              { slug: { equals: area.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-"), mode: "insensitive" } },
+            ],
+          },
+        });
+        resolvedMarketId = matchedMarket ? matchedMarket.id : null;
+        if (matchedMarket) resolvedArea = matchedMarket.name;
+      } else {
+        resolvedMarketId = null;
+      }
+    } else if (directMarketId) {
+      const matchedMarket = await prisma.market.findUnique({
+        where: { id: directMarketId },
+      });
+      if (matchedMarket) {
+        resolvedArea = matchedMarket.name;
+      }
+    }
+
     const updatedShop = await prisma.shop.update({
       where: { id: shop.id },
       data: {
@@ -180,7 +237,8 @@ export async function PUT(req: NextRequest) {
         ...(phone ? { phone } : {}),
         ...(email !== undefined ? { email } : {}),
         ...(address ? { address } : {}),
-        ...(area ? { area } : {}),
+        ...(resolvedArea !== undefined ? { area: resolvedArea } : {}),
+        ...(resolvedMarketId !== undefined ? { marketId: resolvedMarketId } : {}),
         ...(pincode ? { pincode } : {}),
         ...(latitude !== undefined ? { latitude: parseFloat(latitude) } : {}),
         ...(longitude !== undefined ? { longitude: parseFloat(longitude) } : {}),

@@ -54,6 +54,18 @@ export async function PUT(
       images,
     } = body;
 
+    let matchedCategory: any = null;
+    if (category) {
+      matchedCategory = await prisma.category.findFirst({
+        where: {
+          OR: [
+            { name: { equals: category, mode: "insensitive" } },
+            { slug: { equals: category.toLowerCase().replace(/[^a-z0-9]+/g, "-"), mode: "insensitive" } },
+          ],
+        },
+      });
+    }
+
     const updated = await prisma.product.update({
       where: { id },
       data: {
@@ -62,7 +74,12 @@ export async function PUT(
         ...(brand !== undefined ? { brand } : {}),
         ...(price !== undefined ? { price: parseFloat(price) } : {}),
         ...(mrp !== undefined ? { mrp: mrp ? parseFloat(mrp) : null } : {}),
-        ...(category ? { category } : {}),
+        ...(category
+          ? {
+              category: matchedCategory ? matchedCategory.name : category,
+              categoryId: matchedCategory ? matchedCategory.id : null,
+            }
+          : {}),
         ...(subcategory !== undefined ? { subcategory } : {}),
         ...(gender ? { gender } : {}),
         ...(sizes !== undefined

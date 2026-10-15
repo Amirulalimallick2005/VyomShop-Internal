@@ -14,6 +14,12 @@ import { UserList } from "./UserList";
 import { PackageList } from "./PackageList";
 import { PackageCreate } from "./PackageCreate";
 import { TransactionList } from "./TransactionList";
+import { CategoryList } from "./CategoryList";
+import { CategoryCreate } from "./CategoryCreate";
+import { CategoryEdit } from "./CategoryEdit";
+import { MarketList } from "./MarketList";
+import { MarketCreate } from "./MarketCreate";
+import { MarketEdit } from "./MarketEdit";
 import {
   ShieldCheck,
   Store,
@@ -21,6 +27,8 @@ import {
   Users,
   CreditCard,
   Receipt,
+  Tags,
+  MapPin,
 } from "lucide-react";
 
 const AdminLayout = (props: any) => (
@@ -53,6 +61,20 @@ const AdminApp = () => {
         name="products"
         list={ProductList}
         icon={Package}
+      />
+      <Resource
+        name="categories"
+        list={CategoryList}
+        create={CategoryCreate}
+        edit={CategoryEdit}
+        icon={Tags}
+      />
+      <Resource
+        name="markets"
+        list={MarketList}
+        create={MarketCreate}
+        edit={MarketEdit}
+        icon={MapPin}
       />
       <Resource
         name="users"

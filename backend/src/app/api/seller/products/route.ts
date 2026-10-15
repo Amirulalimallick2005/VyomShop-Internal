@@ -115,6 +115,15 @@ export async function POST(req: NextRequest) {
     const sizesString = Array.isArray(sizes) ? sizes.join(", ") : sizes || "";
     const colorsString = Array.isArray(colors) ? colors.join(", ") : colors || "";
 
+    const matchedCategory = await prisma.category.findFirst({
+      where: {
+        OR: [
+          { name: { equals: category, mode: "insensitive" } },
+          { slug: { equals: category.toLowerCase().replace(/[^a-z0-9]+/g, "-"), mode: "insensitive" } },
+        ],
+      },
+    });
+
     // Atomic transaction: deduct 1 credit, log transaction, create product
     const [updatedShop, , newProduct] = await prisma.$transaction([
       prisma.shop.update({
@@ -135,12 +144,13 @@ export async function POST(req: NextRequest) {
       prisma.product.create({
         data: {
           shopId: shop.id,
+          categoryId: matchedCategory ? matchedCategory.id : null,
           name,
           description: description || null,
           brand: brand || null,
           price: parseFloat(price),
           mrp: mrp ? parseFloat(mrp) : null,
-          category,
+          category: matchedCategory ? matchedCategory.name : category,
           subcategory: subcategory || null,
           gender,
           sizes: sizesString,

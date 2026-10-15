@@ -71,6 +71,12 @@ const customMessages: any = {
     analytics: {
       name: "Analytics |||| Analytics",
     },
+    categories: {
+      name: "Category |||| Categories",
+    },
+    markets: {
+      name: "Market / Area |||| Markets & Areas",
+    },
   },
 };
 

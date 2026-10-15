@@ -25,30 +25,19 @@ import {
 import { useNotify } from "ra-core";
 import { Store, MapPin, Image as ImageIcon, Save, Plus, AlertCircle, Clock, CheckCircle } from "lucide-react";
 
-const DELHI_AREAS = [
-  "Lajpat Nagar",
-  "Karol Bagh",
-  "Sarojini Nagar",
-  "Kamla Nagar",
-  "Chandni Chowk",
-  "Connaught Place",
-  "Nehru Place",
-  "Janpath",
-  "Khan Market",
-  "South Ex",
-  "Saket",
-  "Dwarka",
-  "Rohini",
-  "Vasant Kunj",
-  "Pitampura",
-];
-
 const statusVariants: Record<string, string> = {
   PENDING: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-300 dark:border-amber-700",
   APPROVED: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-300 dark:border-emerald-700",
   REJECTED: "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-300 dark:border-rose-700",
   SUSPENDED: "bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-300 dark:border-slate-700",
 };
+
+interface MarketItem {
+  id: string;
+  name: string;
+  slug: string;
+  city?: string;
+}
 
 export const SellerShopProfile = () => {
   const notify = useNotify();
@@ -57,6 +46,8 @@ export const SellerShopProfile = () => {
   const [hasShop, setHasShop] = useState(false);
   const [shopStatus, setShopStatus] = useState<string | null>(null);
   const [rejectionReason, setRejectionReason] = useState<string | null>(null);
+  const [markets, setMarkets] = useState<MarketItem[]>([]);
+  const [marketsLoading, setMarketsLoading] = useState(true);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -75,6 +66,7 @@ export const SellerShopProfile = () => {
   });
 
   useEffect(() => {
+    // Load shop profile
     fetch("/api/seller/shop", { credentials: "include" })
       .then((res) => res.json())
       .then((data) => {
@@ -101,6 +93,17 @@ export const SellerShopProfile = () => {
         setLoading(false);
       })
       .catch(() => setLoading(false));
+
+    // Load available markets dynamically from database
+    fetch("/api/markets")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.markets) {
+          setMarkets(data.markets);
+        }
+      })
+      .catch((err) => console.error("Failed to load markets:", err))
+      .finally(() => setMarketsLoading(false));
   }, []);
 
   const handleChange = (field: string, value: string) => {
@@ -308,14 +311,19 @@ export const SellerShopProfile = () => {
                   onValueChange={(val) => handleChange("area", val || "")}
                 >
                   <SelectTrigger id="area" className="w-full">
-                    <SelectValue placeholder="Select market area" />
+                    <SelectValue placeholder={marketsLoading ? "Loading markets..." : "Select market area"} />
                   </SelectTrigger>
                   <SelectContent>
-                    {DELHI_AREAS.map((area) => (
-                      <SelectItem key={area} value={area}>
-                        {area}
+                    {markets.map((market) => (
+                      <SelectItem key={market.id} value={market.name}>
+                        {market.name}
                       </SelectItem>
                     ))}
+                    {formData.area && !markets.some((m) => m.name === formData.area) && (
+                      <SelectItem key={formData.area} value={formData.area}>
+                        {formData.area}
+                      </SelectItem>
+                    )}
                   </SelectContent>
                 </Select>
               </div>

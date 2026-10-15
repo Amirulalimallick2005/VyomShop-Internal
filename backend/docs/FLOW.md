@@ -41,15 +41,17 @@ The system splits authentication and state management between Firebase and Postg
 
 ## 2. Database Schema & Entity Relationships
 
-The Prisma schema (`backend/prisma/schema.prisma`) defines 7 core models:
+The Prisma schema (`backend/prisma/schema.prisma`) defines 9 core models:
 
 ```mermaid
 erDiagram
     User ||--o{ Shop : owns
     User ||--o{ AnalyticsLog : generates
+    Market ||--o{ Shop : contains
     Shop ||--o{ Product : contains
     Shop ||--o{ Transaction : has
     Shop ||--o{ AnalyticsLog : receives
+    Category ||--o{ Product : categorizes
     Package ||--o{ Transaction : applies_to
     Product ||--o{ AnalyticsLog : tracked_in
     SystemSetting
@@ -68,6 +70,7 @@ erDiagram
     Shop {
         string id PK "cuid"
         string ownerId FK "References User.id"
+        string marketId FK "References Market.id"
         string name
         string slug "Unique"
         string description
@@ -154,6 +157,33 @@ erDiagram
         string key "Unique"
         string value
         string description
+        datetime updatedAt
+    }
+
+    Category {
+        string id PK "cuid"
+        string name "Unique"
+        string slug "Unique"
+        string description
+        string icon
+        boolean isActive
+        int sortOrder
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    Market {
+        string id PK "cuid"
+        string name "Unique"
+        string slug "Unique"
+        string city "Default: Delhi"
+        string pincode
+        float latitude
+        float longitude
+        string description
+        boolean isActive
+        int sortOrder
+        datetime createdAt
         datetime updatedAt
     }
 
