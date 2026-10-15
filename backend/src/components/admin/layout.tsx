@@ -21,15 +21,21 @@ import { Loading } from "@/components/admin/loading";
  *
  * @see {@link https://marmelab.com/shadcn-admin-kit/docs/layout/ Layout documentation}
  */
-export const Layout = (props: CoreLayoutProps & { title?: string; icon?: React.ReactNode }) => {
-  const { title, icon, children } = props;
+export const Layout = (
+  props: CoreLayoutProps & {
+    title?: string;
+    icon?: React.ReactNode;
+    sidebar?: React.ComponentType<{ title?: string; icon?: React.ReactNode }>;
+  }
+) => {
+  const { title, icon, sidebar: SidebarComponent = AppSidebar, children } = props;
   const [errorInfo, setErrorInfo] = useState<ErrorInfo | undefined>(undefined);
   const handleError = (_: unknown, info: ErrorInfo) => {
     setErrorInfo(info);
   };
   return (
     <SidebarProvider>
-      <AppSidebar title={title} icon={icon} />
+      <SidebarComponent title={title} icon={icon} />
       <main
         className={cn(
           "ml-auto w-full max-w-full",

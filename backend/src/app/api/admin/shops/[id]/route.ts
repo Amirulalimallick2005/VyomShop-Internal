@@ -79,6 +79,33 @@ export async function PATCH(
       data,
     });
 
+    // Synchronize owner role based on shop status
+    if (status !== undefined && existing.ownerId) {
+      const owner = await prisma.user.findUnique({ where: { id: existing.ownerId } });
+      if (owner && owner.role !== "SUPER_ADMIN" && owner.role !== "ADMIN") {
+        if (status === "APPROVED") {
+          await prisma.user.update({
+            where: { id: existing.ownerId },
+            data: { role: "SELLER" },
+          });
+        } else if (["REJECTED", "SUSPENDED", "PENDING"].includes(status)) {
+          const otherApproved = await prisma.shop.count({
+            where: {
+              ownerId: existing.ownerId,
+              status: "APPROVED",
+              id: { not: existing.id },
+            },
+          });
+          if (otherApproved === 0) {
+            await prisma.user.update({
+              where: { id: existing.ownerId },
+              data: { role: "CUSTOMER" },
+            });
+          }
+        }
+      }
+    }
+
     return NextResponse.json(updated);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -102,7 +129,32 @@ export async function DELETE(
   const { id } = await params;
 
   try {
+    const existing = await prisma.shop.findUnique({ where: { id } });
+    if (!existing) {
+      return NextResponse.json({ error: "Shop not found" }, { status: 404 });
+    }
+
     await prisma.shop.delete({ where: { id } });
+
+    // Revert owner role to CUSTOMER if no remaining approved shop exists
+    if (existing.ownerId) {
+      const owner = await prisma.user.findUnique({ where: { id: existing.ownerId } });
+      if (owner && owner.role !== "SUPER_ADMIN" && owner.role !== "ADMIN") {
+        const remainingApproved = await prisma.shop.count({
+          where: {
+            ownerId: existing.ownerId,
+            status: "APPROVED",
+          },
+        });
+        if (remainingApproved === 0) {
+          await prisma.user.update({
+            where: { id: existing.ownerId },
+            data: { role: "CUSTOMER" },
+          });
+        }
+      }
+    }
+
     return NextResponse.json({ success: true, message: "Shop deleted" });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

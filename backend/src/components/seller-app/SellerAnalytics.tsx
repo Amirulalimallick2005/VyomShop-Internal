@@ -11,6 +11,10 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { LinkBase } from "ra-core";
+import { useSellerShop } from "@/hooks/useSellerShop";
 import {
   Eye,
   Navigation,
@@ -18,6 +22,8 @@ import {
   TrendingUp,
   BarChart2,
   Activity,
+  Lock,
+  ArrowRight,
 } from "lucide-react";
 
 const eventTypeVariants: Record<string, string> = {
@@ -28,18 +34,47 @@ const eventTypeVariants: Record<string, string> = {
 };
 
 export const SellerAnalytics = () => {
+  const { shopStatus, isLoading: shopLoading } = useSellerShop();
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/seller/analytics", { credentials: "include" })
-      .then((res) => res.json())
-      .then((res) => {
-        setData(res);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
-  }, []);
+    if (shopStatus === "APPROVED") {
+      fetch("/api/seller/analytics", { credentials: "include" })
+        .then((res) => res.json())
+        .then((res) => {
+          setData(res);
+          setLoading(false);
+        })
+        .catch(() => setLoading(false));
+    } else {
+      setLoading(false);
+    }
+  }, [shopStatus]);
+
+  if (!shopLoading && shopStatus !== "APPROVED") {
+    return (
+      <div className="p-6 max-w-xl">
+        <Alert variant={shopStatus === "REJECTED" ? "destructive" : "default"}>
+          <Lock className="size-4" />
+          <AlertTitle>Analytics Locked</AlertTitle>
+          <AlertDescription className="mt-2 text-sm space-y-3">
+            <p>
+              {shopStatus === "PENDING" && "Your shop application is currently pending admin verification. Store analytics will unlock once your shop is approved."}
+              {shopStatus === "REJECTED" && "Your shop application was rejected. Please review and update your shop details to re-apply."}
+              {shopStatus === "SUSPENDED" && "Your shop is currently suspended. Please contact platform support."}
+              {(!shopStatus || shopStatus === null) && "You haven't registered a shop yet. Register your shop profile first."}
+            </p>
+            <div>
+              <Button size="sm" variant="outline" render={<LinkBase to="/shop" />}>
+                Go to Shop Profile <ArrowRight className="size-3.5 ml-1" />
+              </Button>
+            </div>
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
 
   if (loading) {
     return (

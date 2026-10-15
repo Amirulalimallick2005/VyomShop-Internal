@@ -59,11 +59,6 @@ export const SellerLoginPage = () => {
       const res = await signInWithPopup(auth, provider);
       const token = await res.user.getIdToken();
       document.cookie = `firebase_token=${token}; path=/; max-age=604800`;
-      await fetch("/api/auth/selectRole", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ role: "SELLER" }),
-      });
       navigate("/");
     } catch (err: any) {
       setError(err?.message || "Google sign-in failed");
@@ -99,11 +94,6 @@ export const SellerLoginPage = () => {
       const credential = await confirmationResult.confirm(otp.trim());
       const token = await credential.user.getIdToken();
       document.cookie = `firebase_token=${token}; path=/; max-age=604800`;
-      await fetch("/api/auth/selectRole", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ role: "SELLER" }),
-      });
       navigate("/");
     } catch (err: any) {
       setError(err?.message || "Invalid OTP entered. Please try again.");

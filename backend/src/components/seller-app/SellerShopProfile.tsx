@@ -23,7 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useNotify } from "ra-core";
-import { Store, MapPin, Image as ImageIcon, Save, Plus, AlertCircle } from "lucide-react";
+import { Store, MapPin, Image as ImageIcon, Save, Plus, AlertCircle, Clock, CheckCircle } from "lucide-react";
 
 const DELHI_AREAS = [
   "Lajpat Nagar",
@@ -127,7 +127,7 @@ export const SellerShopProfile = () => {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to save shop details");
 
-      notify(hasShop ? "Shop details updated successfully" : "Shop registered successfully! Awaiting approval.", {
+      notify(hasShop ? "Application updated successfully" : "Application submitted successfully! Awaiting admin approval.", {
         type: "info",
       });
       setHasShop(true);
@@ -154,10 +154,12 @@ export const SellerShopProfile = () => {
     <div className="p-6 space-y-6 max-w-4xl pb-16">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Shop Profile</h1>
+          <h1 className="text-2xl font-bold tracking-tight">
+            {hasShop ? "Shop Application" : "Shop Application"}
+          </h1>
           <p className="text-sm text-muted-foreground">
             {hasShop
-              ? "Update your storefront information, address, and operating hours"
+              ? "Your shop application has been submitted. View and edit your details below."
               : "Register your shop to start listing products on Vyom"}
           </p>
         </div>
@@ -167,6 +169,27 @@ export const SellerShopProfile = () => {
           </Badge>
         )}
       </div>
+
+      {hasShop && shopStatus === "PENDING" && (
+        <Alert className="border-amber-500/20 bg-amber-500/5">
+          <Clock className="size-4 text-amber-600" />
+          <AlertTitle>Application Submitted</AlertTitle>
+          <AlertDescription className="text-xs text-muted-foreground mt-1">
+            Your shop application has been submitted and is currently under review by the admin team. 
+            You can edit your application details below while it's being reviewed.
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {hasShop && shopStatus === "APPROVED" && (
+        <Alert className="border-emerald-500/20 bg-emerald-500/5">
+          <CheckCircle className="size-4 text-emerald-600" />
+          <AlertTitle>Shop Approved!</AlertTitle>
+          <AlertDescription className="text-xs text-muted-foreground mt-1">
+            Congratulations! Your shop has been approved and is now live on Vyom. You can now list products and manage your inventory.
+          </AlertDescription>
+        </Alert>
+      )}
 
       {!hasShop && (
         <Alert className="border-primary/20 bg-primary/5">
@@ -382,11 +405,11 @@ export const SellerShopProfile = () => {
               "Saving..."
             ) : hasShop ? (
               <>
-                <Save className="size-4 mr-2" /> Save Changes
+                <Save className="size-4 mr-2" /> Update Application
               </>
             ) : (
               <>
-                <Plus className="size-4 mr-2" /> Register Shop
+                <Plus className="size-4 mr-2" /> Submit Application
               </>
             )}
           </Button>

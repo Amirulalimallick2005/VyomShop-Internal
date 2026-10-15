@@ -15,11 +15,6 @@ export const raSellerAuthProvider: AuthProvider = {
       const res = await signInWithPopup(auth, provider);
       const token = await res.user.getIdToken();
       document.cookie = `firebase_token=${token}; path=/; max-age=604800`;
-      await fetch("/api/auth/selectRole", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ role: "SELLER" }),
-      });
       return Promise.resolve();
     }
     return Promise.resolve();
@@ -59,7 +54,19 @@ export const raSellerAuthProvider: AuthProvider = {
     return Promise.resolve();
   },
 
-  getPermissions: async () => "SELLER",
+  getPermissions: async () => {
+    const token = document.cookie.match(/firebase_token=([^;]+)/)?.[1];
+    if (!token) return "CUSTOMER";
+    try {
+      const res = await fetch("/api/auth/me", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      return data.user?.role || "CUSTOMER";
+    } catch {
+      return "CUSTOMER";
+    }
+  },
 
   getIdentity: async () => {
     const token = document.cookie.match(/firebase_token=([^;]+)/)?.[1];

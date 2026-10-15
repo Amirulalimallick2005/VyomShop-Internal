@@ -23,6 +23,28 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const targetRole = role.toUpperCase();
+
+    const currentUser = await prisma.user.findUnique({ where: { id: authContext.firebaseUid } });
+    if (currentUser?.role === "SUPER_ADMIN" || currentUser?.role === "ADMIN") {
+      return NextResponse.json(
+        { success: false, error: "Admin accounts cannot change their role" },
+        { status: 403 }
+      );
+    }
+
+    if (targetRole === "SELLER") {
+      const approvedShop = await prisma.shop.findFirst({
+        where: { ownerId: authContext.firebaseUid, status: "APPROVED" },
+      });
+      if (!approvedShop) {
+        return NextResponse.json(
+          { success: false, error: "Cannot switch to SELLER role without an approved shop application" },
+          { status: 400 }
+        );
+      }
+    }
+
     const updatedUser = await prisma.user.update({
       where: { id: authContext.firebaseUid },
       data: { role: role.toUpperCase() },

@@ -61,9 +61,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (shop.status === "REJECTED" || shop.status === "SUSPENDED") {
+    if (shop.status !== "APPROVED") {
       return NextResponse.json(
-        { success: false, error: `Shop is currently ${shop.status.toLowerCase()}. Cannot publish products.` },
+        { success: false, error: `Shop is currently ${shop.status.toLowerCase()}. Only approved shops can publish products.` },
         { status: 403 }
       );
     }

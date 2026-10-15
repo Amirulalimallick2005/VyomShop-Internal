@@ -289,15 +289,18 @@ export async function POST(req: NextRequest) {
 
 ## 4. Key Workflows & State Transitions
 
-### A. Role Selection (`CUSTOMER` → `SELLER`)
+### A. Role Lifecycle (`CUSTOMER` ↔ `SELLER`)
 1. By default, every newly provisioned user starts with role `CUSTOMER`.
-2. When the user chooses to become a seller in the UI, the client calls `POST /api/auth/selectRole` with `{ "role": "SELLER" }`.
-3. The server updates `users.role` to `SELLER` in PostgreSQL.
+2. Users who log in to the Seller Portal remain `CUSTOMER` while setting up their shop application.
+3. Upon shop application submission (`POST /api/seller/shop`), a `shops` record is created with `status: "PENDING"`.
+4. **Admin Approval**: When an admin approves the shop (`status: "APPROVED"` via `/api/admin/shops/[id]`), the owner's role is automatically upgraded to `SELLER`.
+5. **Admin Rejection / Suspension / Deletion**: If the shop is rejected, suspended, or deleted by the admin, the owner's role is reverted back to `CUSTOMER` (provided they have no other approved shop).
 
 ### B. Shop Lifecycle
-1. **Creation**: Seller calls `POST /api/seller/shop`. A `shops` record is created with `status: "PENDING"`.
-2. **Moderation**: Admin reviews the shop via `/api/admin/shops` and updates status to `APPROVED` or `REJECTED`.
-3. **Product Publishing**: Once approved, sellers can upload products (`POST /api/seller/products`). Publishing checks and deducts `shops.creditsBalance`.
+1. **Creation**: User registers shop via `POST /api/seller/shop` (`status: "PENDING"`).
+2. **Moderation**: Admin reviews the shop via `/api/admin/shops/[id]`. Approving sets `status: "APPROVED"` and user role to `SELLER`. Rejecting sets `status: "REJECTED"` with a reason and reverts user role to `CUSTOMER`.
+3. **Resubmission**: If rejected, the user can edit details (`PUT /api/seller/shop`), which resets status back to `PENDING` for re-review.
+4. **Product Publishing**: Once approved, sellers can upload products (`POST /api/seller/products`). Publishing checks and deducts `shops.creditsBalance`.
 
 ### C. Credit Packages & Purchases
 1. Seller views credit plans via `GET /api/seller/packages`.

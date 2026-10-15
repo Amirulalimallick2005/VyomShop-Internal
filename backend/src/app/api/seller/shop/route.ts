@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/authHelper";
 
 export async function GET(req: NextRequest) {
-  const authRes = await requireAuth(req, ["SELLER", "SUPER_ADMIN", "ADMIN"]);
+  const authRes = await requireAuth(req, ["CUSTOMER", "SELLER", "SUPER_ADMIN", "ADMIN"]);
   if ("response" in authRes) return authRes.response;
 
   const { authContext } = authRes;
@@ -38,7 +38,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const authRes = await requireAuth(req, ["SELLER", "SUPER_ADMIN", "ADMIN"]);
+  const authRes = await requireAuth(req, ["CUSTOMER", "SELLER", "SUPER_ADMIN", "ADMIN"]);
   if ("response" in authRes) return authRes.response;
 
   const { authContext } = authRes;
@@ -142,7 +142,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PUT(req: NextRequest) {
-  const authRes = await requireAuth(req, ["SELLER", "SUPER_ADMIN", "ADMIN"]);
+  const authRes = await requireAuth(req, ["CUSTOMER", "SELLER", "SUPER_ADMIN", "ADMIN"]);
   if ("response" in authRes) return authRes.response;
 
   const { authContext } = authRes;
@@ -189,6 +189,8 @@ export async function PUT(req: NextRequest) {
         ...(bannerImage !== undefined ? { bannerImage } : {}),
         ...(timings ? { timings } : {}),
         ...(description !== undefined ? { description } : {}),
+        // If shop was previously rejected, updating shop details resets it to PENDING for admin review
+        ...(shop.status === "REJECTED" ? { status: "PENDING", rejectionReason: null } : {}),
       },
     });
 

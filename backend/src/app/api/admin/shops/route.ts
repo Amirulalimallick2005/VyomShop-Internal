@@ -136,6 +136,16 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    if (status === "APPROVED" && newShop.ownerId) {
+      const owner = await prisma.user.findUnique({ where: { id: newShop.ownerId } });
+      if (owner && owner.role !== "SUPER_ADMIN" && owner.role !== "ADMIN") {
+        await prisma.user.update({
+          where: { id: newShop.ownerId },
+          data: { role: "SELLER" },
+        });
+      }
+    }
+
     return NextResponse.json(newShop, { status: 201 });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

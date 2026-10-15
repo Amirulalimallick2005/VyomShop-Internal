@@ -12,6 +12,7 @@ import { SellerProductCreate } from "./SellerProductCreate";
 import { SellerProductEdit } from "./SellerProductEdit";
 import { SellerShopProfile } from "./SellerShopProfile";
 import { SellerAnalytics } from "./SellerAnalytics";
+import { SellerSidebar } from "./SellerSidebar";
 import {
   Store,
   Package,
@@ -23,6 +24,7 @@ const SellerLayout = (props: any) => (
     {...props}
     title="Vyom Seller"
     icon={<Store className="!size-5 text-orange-600 dark:text-orange-400" />}
+    sidebar={SellerSidebar}
   />
 );
 

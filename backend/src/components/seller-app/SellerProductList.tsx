@@ -5,8 +5,12 @@ import { List } from "@/components/admin/list";
 import { DataTable } from "@/components/admin/data-table";
 import { EditButton } from "@/components/admin/edit-button";
 import { DeleteButton } from "@/components/admin/delete-button";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Package } from "lucide-react";
+import { LinkBase } from "ra-core";
+import { useSellerShop } from "@/hooks/useSellerShop";
+import { Package, Lock, ArrowRight } from "lucide-react";
 
 const stockVariants: Record<string, string> = {
   IN_STOCK: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-300 dark:border-emerald-700",
@@ -15,6 +19,32 @@ const stockVariants: Record<string, string> = {
 };
 
 export const SellerProductList = () => {
+  const { shopStatus, isLoading } = useSellerShop();
+
+  if (!isLoading && shopStatus !== "APPROVED") {
+    return (
+      <div className="p-6 max-w-xl">
+        <Alert variant={shopStatus === "REJECTED" ? "destructive" : "default"}>
+          <Lock className="size-4" />
+          <AlertTitle>Products Catalog Locked</AlertTitle>
+          <AlertDescription className="mt-2 text-sm space-y-3">
+            <p>
+              {shopStatus === "PENDING" && "Your shop application is currently pending admin verification. Product management will unlock once your shop is approved."}
+              {shopStatus === "REJECTED" && "Your shop application was rejected. Please review and update your shop details to re-apply."}
+              {shopStatus === "SUSPENDED" && "Your shop is currently suspended. Please contact platform support."}
+              {(!shopStatus || shopStatus === null) && "You haven't registered a shop yet. Register your shop profile first."}
+            </p>
+            <div>
+              <Button size="sm" variant="outline" render={<LinkBase to="/shop" />}>
+                Go to Shop Profile <ArrowRight className="size-3.5 ml-1" />
+              </Button>
+            </div>
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
+
   return (
     <List>
       <DataTable>

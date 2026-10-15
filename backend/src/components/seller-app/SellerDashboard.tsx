@@ -68,7 +68,7 @@ export const SellerDashboard = () => {
   const shop = (identity as any)?.shop;
 
   useEffect(() => {
-    if (shop) {
+    if (shop && shop.status === "APPROVED") {
       Promise.all([
         fetch("/api/seller/analytics", { credentials: "include" })
           .then((r) => r.json())
