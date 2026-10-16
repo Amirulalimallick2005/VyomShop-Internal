@@ -6,6 +6,7 @@ import { SimpleForm } from "@/components/admin/simple-form";
 import { TextInput } from "@/components/admin/text-input";
 import { NumberInput } from "@/components/admin/number-input";
 import { BooleanInput } from "@/components/admin/boolean-input";
+import { ImageUploadInput } from "@/components/admin/image-upload-input";
 import { required } from "ra-core";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -30,11 +31,13 @@ export const CategoryEdit = () => {
                 label="Sort Order"
                 helperText="Lower numbers appear first in the seller listing dropdown"
               />
-              <TextInput
-                source="icon"
-                label="Icon / Image URL (optional)"
-              />
             </div>
+            <ImageUploadInput
+              source="icon"
+              label="Category Icon / Image (optional)"
+              helperText="Upload a category icon or image"
+              folder="categories"
+            />
             <TextInput
               source="description"
               label="Description (optional)"

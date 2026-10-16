@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ImageUpload } from "@/components/ui/image-upload";
 import {
   Select,
   SelectContent,
@@ -381,24 +382,20 @@ export const SellerShopProfile = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="shopImage">Shop Image URL</Label>
-                <Input
-                  id="shopImage"
-                  placeholder="https://example.com/storefront.jpg"
-                  value={formData.shopImage}
-                  onChange={(e) => handleChange("shopImage", e.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="bannerImage">Banner Image URL</Label>
-                <Input
-                  id="bannerImage"
-                  placeholder="https://example.com/banner.jpg"
-                  value={formData.bannerImage}
-                  onChange={(e) => handleChange("bannerImage", e.target.value)}
-                />
-              </div>
+              <ImageUpload
+                label="Shop Image"
+                value={formData.shopImage}
+                onChange={(url) => handleChange("shopImage", typeof url === "string" ? url : url?.[0] || "")}
+                folder="shops"
+                helperText="Upload your shop's storefront image"
+              />
+              <ImageUpload
+                label="Banner Image"
+                value={formData.bannerImage}
+                onChange={(url) => handleChange("bannerImage", typeof url === "string" ? url : url?.[0] || "")}
+                folder="shops"
+                helperText="Upload a banner image for your shop"
+              />
             </div>
           </CardContent>
         </Card>

@@ -6,6 +6,7 @@ import { SimpleForm } from "@/components/admin/simple-form";
 import { TextInput } from "@/components/admin/text-input";
 import { NumberInput } from "@/components/admin/number-input";
 import { SelectInput } from "@/components/admin/select-input";
+import { ImageUploadInput } from "@/components/admin/image-upload-input";
 import { required } from "ra-core";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -89,10 +90,13 @@ export const SellerProductEdit = () => {
               rows={3}
             />
 
-            <TextInput
+            <ImageUploadInput
               source="images"
-              label="Image URLs (comma separated or single URL)"
-              helperText="Paste image link(s) for your product"
+              label="Product Images"
+              helperText="Upload product images (max 5 images)"
+              multiple
+              maxFiles={5}
+              folder="products"
             />
           </SimpleForm>
         </CardContent>

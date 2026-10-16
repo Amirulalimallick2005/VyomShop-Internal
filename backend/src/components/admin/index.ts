@@ -30,6 +30,7 @@ export * from "./email-field";
 export * from "./error";
 export * from "./export-button";
 export * from "./image-field";
+export * from "./image-upload-input";
 export * from "./field-toggle";
 export * from "./file-field";
 export * from "./file-input";
