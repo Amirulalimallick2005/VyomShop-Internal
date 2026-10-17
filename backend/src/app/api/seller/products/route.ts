@@ -28,18 +28,32 @@ export async function GET(req: NextRequest) {
     success: true,
     count: products.length,
     creditsBalance: shop.creditsBalance,
-    products: products.map((p) => ({
-      ...p,
-      images: (() => {
-        try {
-          return JSON.parse(p.images);
-        } catch {
-          return [p.images];
-        }
-      })(),
-      sizes: p.sizes ? p.sizes.split(",").map((s) => s.trim()) : [],
-      colors: p.colors ? p.colors.split(",").map((c) => c.trim()) : [],
-    })),
+    products: products.map((p) => {
+      const attrs = (p.attributes as Record<string, any>) || {};
+      return {
+        ...p,
+        attributes: attrs,
+        images: (() => {
+          try {
+            return JSON.parse(p.images);
+          } catch {
+            return [p.images];
+          }
+        })(),
+        sizes: attrs.sizes
+          ? Array.isArray(attrs.sizes)
+            ? attrs.sizes
+            : String(attrs.sizes).split(",").map((s) => s.trim())
+          : [],
+        colors: attrs.colors || attrs.colour
+          ? Array.isArray(attrs.colors || attrs.colour)
+            ? attrs.colors || attrs.colour
+            : String(attrs.colors || attrs.colour).split(",").map((c) => c.trim())
+          : [],
+        gender: attrs.gender || null,
+        subcategory: attrs.type || null,
+      };
+    }),
   });
 }
 
@@ -96,12 +110,13 @@ export async function POST(req: NextRequest) {
       price,
       mrp,
       category,
-      subcategory,
-      gender = "Unisex",
-      sizes = [],
-      colors = [],
       stockStatus = "IN_STOCK",
       images = [],
+      attributes = {},
+      subcategory,
+      gender,
+      sizes,
+      colors,
     } = body;
 
     if (!name || price === undefined || !category) {
@@ -112,8 +127,19 @@ export async function POST(req: NextRequest) {
     }
 
     const imagesArray = Array.isArray(images) ? images : [images].filter(Boolean);
-    const sizesString = Array.isArray(sizes) ? sizes.join(", ") : sizes || "";
-    const colorsString = Array.isArray(colors) ? colors.join(", ") : colors || "";
+
+    // Merge attributes from template fields and any legacy fields
+    const attributesObj: Record<string, any> = {
+      ...(typeof attributes === "object" && attributes !== null ? attributes : {}),
+    };
+    if (gender !== undefined && !attributesObj.gender) attributesObj.gender = gender;
+    if (sizes !== undefined && !attributesObj.sizes) {
+      attributesObj.sizes = Array.isArray(sizes) ? sizes : String(sizes).split(",").map((s) => s.trim());
+    }
+    if (colors !== undefined && !attributesObj.colors && !attributesObj.colour) {
+      attributesObj.colour = Array.isArray(colors) ? colors : String(colors).split(",").map((c) => c.trim());
+    }
+    if (subcategory !== undefined && !attributesObj.type) attributesObj.type = subcategory;
 
     const matchedCategory = await prisma.category.findFirst({
       where: {
@@ -151,11 +177,8 @@ export async function POST(req: NextRequest) {
           price: parseFloat(price),
           mrp: mrp ? parseFloat(mrp) : null,
           category: matchedCategory ? matchedCategory.name : category,
-          subcategory: subcategory || null,
-          gender,
-          sizes: sizesString,
-          colors: colorsString,
           stockStatus,
+          attributes: attributesObj,
           images: JSON.stringify(imagesArray),
           moderationStatus: "APPROVED", // Or PENDING if auto-mod disabled
         },
@@ -169,8 +192,7 @@ export async function POST(req: NextRequest) {
       product: {
         ...newProduct,
         images: imagesArray,
-        sizes: sizesString ? sizesString.split(",").map((s: string) => s.trim()) : [],
-        colors: colorsString ? colorsString.split(",").map((c: string) => c.trim()) : [],
+        attributes: attributesObj,
       },
     });
   } catch (error: any) {

@@ -50,28 +50,32 @@ export async function GET(
         bannerImage: shop.bannerImage,
         timings: shop.timings,
         productsCount: shop.products.length,
-        products: shop.products.map((p) => ({
-          id: p.id,
-          name: p.name,
-          description: p.description,
-          brand: p.brand,
-          price: p.price,
-          mrp: p.mrp,
-          category: p.category,
-          subcategory: p.subcategory,
-          gender: p.gender,
-          sizes: p.sizes ? p.sizes.split(",").map((s) => s.trim()) : [],
-          colors: p.colors ? p.colors.split(",").map((c) => c.trim()) : [],
-          stockStatus: p.stockStatus,
-          images: (() => {
-            try {
-              return JSON.parse(p.images);
-            } catch {
-              return [p.images];
-            }
-          })(),
-          createdAt: p.createdAt,
-        })),
+        products: shop.products.map((p) => {
+          const attrs = (p.attributes as Record<string, any>) || {};
+          return {
+            id: p.id,
+            name: p.name,
+            description: p.description,
+            brand: p.brand,
+            price: p.price,
+            mrp: p.mrp,
+            category: p.category,
+            attributes: attrs,
+            subcategory: attrs.type || null,
+            gender: attrs.gender || null,
+            sizes: attrs.sizes ? (Array.isArray(attrs.sizes) ? attrs.sizes : String(attrs.sizes).split(",").map((s) => s.trim())) : [],
+            colors: attrs.colors || attrs.colour ? (Array.isArray(attrs.colors || attrs.colour) ? attrs.colors || attrs.colour : String(attrs.colors || attrs.colour).split(",").map((c) => c.trim())) : [],
+            stockStatus: p.stockStatus,
+            images: (() => {
+              try {
+                return JSON.parse(p.images);
+              } catch {
+                return [p.images];
+              }
+            })(),
+            createdAt: p.createdAt,
+          };
+        }),
       },
     });
   } catch (error: any) {

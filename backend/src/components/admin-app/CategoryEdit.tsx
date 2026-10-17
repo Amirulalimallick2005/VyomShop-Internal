@@ -7,13 +7,14 @@ import { TextInput } from "@/components/admin/text-input";
 import { NumberInput } from "@/components/admin/number-input";
 import { BooleanInput } from "@/components/admin/boolean-input";
 import { ImageUploadInput } from "@/components/admin/image-upload-input";
+import { CategoryTemplateBuilder } from "./CategoryTemplateBuilder";
 import { required } from "ra-core";
 import { Card, CardContent } from "@/components/ui/card";
 
 export const CategoryEdit = () => {
   return (
     <Edit redirect="list">
-      <Card className="max-w-2xl">
+      <Card className="max-w-3xl">
         <CardContent className="pt-6">
           <SimpleForm className="max-w-none">
             <TextInput
@@ -48,6 +49,9 @@ export const CategoryEdit = () => {
               source="isActive"
               label="Active (visible to sellers for product listing)"
             />
+
+            {/* Admin-controlled category template builder */}
+            <CategoryTemplateBuilder source="templateFields" />
           </SimpleForm>
         </CardContent>
       </Card>

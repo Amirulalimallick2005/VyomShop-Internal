@@ -39,6 +39,8 @@ export async function GET(
       },
     });
 
+    const attrs = (product.attributes as Record<string, any>) || {};
+
     return NextResponse.json({
       success: true,
       product: {
@@ -49,10 +51,11 @@ export async function GET(
         price: product.price,
         mrp: product.mrp,
         category: product.category,
-        subcategory: product.subcategory,
-        gender: product.gender,
-        sizes: product.sizes ? product.sizes.split(",").map((s) => s.trim()) : [],
-        colors: product.colors ? product.colors.split(",").map((c) => c.trim()) : [],
+        attributes: attrs,
+        subcategory: attrs.type || null,
+        gender: attrs.gender || null,
+        sizes: attrs.sizes ? (Array.isArray(attrs.sizes) ? attrs.sizes : String(attrs.sizes).split(",").map((s) => s.trim())) : [],
+        colors: attrs.colors || attrs.colour ? (Array.isArray(attrs.colors || attrs.colour) ? attrs.colors || attrs.colour : String(attrs.colors || attrs.colour).split(",").map((c) => c.trim())) : [],
         stockStatus: product.stockStatus,
         images: (() => {
           try {

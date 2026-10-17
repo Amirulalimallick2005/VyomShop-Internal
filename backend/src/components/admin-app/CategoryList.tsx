@@ -38,6 +38,30 @@ export const CategoryList = () => {
             </span>
           )}
         />
+        <DataTable.Col
+          source="templateFields"
+          label="Template"
+          render={(record: any) => {
+            let fields: any[] = [];
+            if (Array.isArray(record.templateFields)) fields = record.templateFields;
+            else if (typeof record.templateFields === "string") {
+              try { fields = JSON.parse(record.templateFields); } catch {}
+            }
+            if (!fields || fields.length === 0) {
+              return <span className="text-xs text-muted-foreground">—</span>;
+            }
+            return (
+              <div className="flex items-center gap-1.5 flex-wrap max-w-xs">
+                <Badge variant="secondary" className="font-mono text-xs">
+                  {fields.length} {fields.length === 1 ? "field" : "fields"}
+                </Badge>
+                <span className="text-[11px] text-muted-foreground line-clamp-1">
+                  ({fields.map((f: any) => f.label || f.name).join(", ")})
+                </span>
+              </div>
+            );
+          }}
+        />
         <DataTable.NumberCol source="sortOrder" label="Sort Order" />
         <DataTable.Col
           source="isActive"

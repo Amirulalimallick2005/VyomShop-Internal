@@ -71,6 +71,7 @@ export async function POST(req: NextRequest) {
       icon,
       isActive = true,
       sortOrder = 0,
+      templateFields,
     } = body;
 
     if (!name || !name.trim()) {
@@ -104,6 +105,9 @@ export async function POST(req: NextRequest) {
         icon: icon || null,
         isActive: Boolean(isActive),
         sortOrder: parseInt(sortOrder, 10) || 0,
+        templateFields: templateFields
+          ? (typeof templateFields === "string" ? JSON.parse(templateFields) : templateFields)
+          : [],
       },
     });
 

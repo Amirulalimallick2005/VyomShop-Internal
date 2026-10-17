@@ -100,18 +100,16 @@ erDiagram
     Product {
         string id PK "cuid"
         string shopId FK "References Shop.id"
+        string categoryId FK "References Category.id"
         string name
         string description
         string brand
         float price
         float mrp
         string category
-        string subcategory
-        string gender
-        string sizes
-        string colors
         string stockStatus "IN_STOCK | LIMITED | OUT_OF_STOCK"
-        string images "JSON array string"
+        json attributes "Category template fields (e.g. type, gender, colour, material, sizes)"
+        string images "JSON array string (1 to 5 photos)"
         boolean isModerated
         string moderationStatus "APPROVED | PENDING | REJECTED"
         int totalViews
@@ -168,6 +166,7 @@ erDiagram
         string icon
         boolean isActive
         int sortOrder
+        json templateFields "Admin-controlled specification template (dropdowns/choices)"
         datetime createdAt
         datetime updatedAt
     }

@@ -77,11 +77,8 @@ model Product {
   price            Float
   mrp              Float?
   category         String   // Category name e.g. "Clothing", "Footwear"
-  subcategory      String?
-  gender           String?  // Men, Women, Unisex, Kids
-  sizes            String?  // e.g. "UK 7, 8, 9" or "S, M, L, XL"
-  colors           String?  // e.g. "Black, Navy Blue"
   stockStatus      String   @default("IN_STOCK") // IN_STOCK, LIMITED, OUT_OF_STOCK
+  attributes       Json?    @default("{}") // Flexible key-value attributes defined by category template
   images           String   // JSON string array of image URLs
   isModerated      Boolean  @default(true)
   moderationStatus String   @default("APPROVED") // APPROVED, PENDING, REJECTED
@@ -173,6 +170,7 @@ model Category {
   icon        String?
   isActive    Boolean   @default(true)
   sortOrder   Int       @default(0)
+  templateFields Json?  @default("[]") // Admin-controlled list of field specifications
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 

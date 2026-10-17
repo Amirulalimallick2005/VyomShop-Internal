@@ -13,6 +13,7 @@ export async function GET() {
         description: true,
         icon: true,
         sortOrder: true,
+        templateFields: true,
       },
     });
 

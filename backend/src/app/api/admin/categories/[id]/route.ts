@@ -45,7 +45,7 @@ export async function PATCH(
     }
 
     const body = await req.json();
-    const { name, slug, description, icon, isActive, sortOrder } = body;
+    const { name, slug, description, icon, isActive, sortOrder, templateFields } = body;
 
     const data: any = {};
     if (name !== undefined) data.name = name.trim();
@@ -56,6 +56,9 @@ export async function PATCH(
     if (icon !== undefined) data.icon = icon || null;
     if (isActive !== undefined) data.isActive = Boolean(isActive);
     if (sortOrder !== undefined) data.sortOrder = parseInt(sortOrder, 10);
+    if (templateFields !== undefined) {
+      data.templateFields = typeof templateFields === "string" ? JSON.parse(templateFields) : templateFields;
+    }
 
     const updated = await prisma.category.update({
       where: { id },

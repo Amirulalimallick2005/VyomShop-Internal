@@ -20,20 +20,22 @@ export async function GET(req: NextRequest) {
 
     if (query) {
       whereClause.OR = [
-        { name: { contains: query } },
-        { brand: { contains: query } },
-        { category: { contains: query } },
-        { subcategory: { contains: query } },
-        { description: { contains: query } },
+        { name: { contains: query, mode: "insensitive" } },
+        { brand: { contains: query, mode: "insensitive" } },
+        { category: { contains: query, mode: "insensitive" } },
+        { description: { contains: query, mode: "insensitive" } },
       ];
     }
 
     if (category) {
-      whereClause.category = { contains: category };
+      whereClause.category = { contains: category, mode: "insensitive" };
     }
 
     if (gender) {
-      whereClause.gender = gender;
+      whereClause.attributes = {
+        path: ["gender"],
+        equals: gender,
+      };
     }
 
     if (minPrice !== undefined || maxPrice !== undefined) {
@@ -58,14 +60,14 @@ export async function GET(req: NextRequest) {
             longitude: true,
             googleMapsPin: true,
             shopImage: true,
-            timings: true,
           },
         },
       },
+      take: 50,
     });
 
-    // Map products to response format
-    let results = products.map((prod) => {
+    const formatted = products.map((prod) => {
+      const attrs = (prod.attributes as Record<string, any>) || {};
       return {
         id: prod.id,
         name: prod.name,
@@ -77,10 +79,11 @@ export async function GET(req: NextRequest) {
           ? Math.round(((prod.mrp - prod.price) / prod.mrp) * 100)
           : 0,
         category: prod.category,
-        subcategory: prod.subcategory,
-        gender: prod.gender,
-        sizes: prod.sizes ? prod.sizes.split(",").map((s) => s.trim()) : [],
-        colors: prod.colors ? prod.colors.split(",").map((c) => c.trim()) : [],
+        attributes: attrs,
+        subcategory: attrs.type || null,
+        gender: attrs.gender || null,
+        sizes: attrs.sizes ? (Array.isArray(attrs.sizes) ? attrs.sizes : String(attrs.sizes).split(",").map((s) => s.trim())) : [],
+        colors: attrs.colors || attrs.colour ? (Array.isArray(attrs.colors || attrs.colour) ? attrs.colors || attrs.colour : String(attrs.colors || attrs.colour).split(",").map((c) => c.trim())) : [],
         stockStatus: prod.stockStatus,
         images: (() => {
           try {
@@ -108,22 +111,20 @@ export async function GET(req: NextRequest) {
 
     // Sorting
     if (sortBy === "price_asc") {
-      results.sort((a, b) => a.price - b.price);
+      formatted.sort((a, b) => a.price - b.price);
     } else if (sortBy === "price_desc") {
-      results.sort((a, b) => b.price - a.price);
+      formatted.sort((a, b) => b.price - a.price);
     } else {
-      // Default: newest
-      results.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      formatted.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     }
 
     return NextResponse.json({
       success: true,
-      count: results.length,
-      query,
-      products: results,
+      count: formatted.length,
+      products: formatted,
     });
   } catch (error: any) {
-    console.error("product search error:", error);
+    console.error("search products error:", error);
     return NextResponse.json(
       { success: false, error: error.message || "Failed to search products" },
       { status: 500 }

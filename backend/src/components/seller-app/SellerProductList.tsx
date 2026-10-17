@@ -93,9 +93,9 @@ export const SellerProductList = () => {
               <Badge variant="secondary" className="text-xs">
                 {record.category}
               </Badge>
-              {record.subcategory && (
+              {(record.attributes?.type || record.subcategory) && (
                 <span className="block text-[11px] text-muted-foreground mt-0.5">
-                  {record.subcategory}
+                  {record.attributes?.type || record.subcategory}
                 </span>
               )}
             </div>
